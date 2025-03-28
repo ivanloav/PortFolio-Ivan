@@ -15,10 +15,10 @@ export default function ContactForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     emailjs.send(
-      "TU_SERVICE_ID",
-      "TU_TEMPLATE_ID",
+      "service_pobawq2",
+      "template_lrkozj7",
       form,
-      "TU_PUBLIC_KEY"
+      "sNNE-HmbZX_4bpg9S"
     ).then(
       () => {
         setSubmitted(true);
