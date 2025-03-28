@@ -7,13 +7,34 @@ export default function ContactForm() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [emailError, setEmailError] = useState("");
+
+  const validateEmail = (email: string) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+
+    if (name === "email") {
+      if (!validateEmail(value)) {
+        setEmailError("Introduce un email válido.");
+      } else {
+        setEmailError("");
+      }
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateEmail(form.email)) {
+      setEmailError("Introduce un email válido.");
+      return;
+    }
+
     emailjs.send(
       "service_pobawq2",
       "template_lrkozj7",
@@ -24,6 +45,7 @@ export default function ContactForm() {
         setSubmitted(true);
         setForm({ name: "", email: "", message: "" });
         setError("");
+        setEmailError("");
       },
       () => {
         setError("Ocurrió un error. Intenta de nuevo más tarde.");
@@ -37,8 +59,23 @@ export default function ContactForm() {
       {submitted && <Alert type="success">Gracias por tu mensaje. Te responderé pronto.</Alert>}
       {error && <Alert type="error">{error}</Alert>}
       <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-        <Input label="Nombre" name="name" value={form.name} onChange={handleChange} placeholder="Tu nombre" />
-        <Input label="Email" name="email" type="email" value={form.email} onChange={handleChange} placeholder="tu@email.com" />
+        <Input
+          label="Nombre"
+          name="name"
+          value={form.name}
+          onChange={handleChange}
+          placeholder="Tu nombre"
+        />
+        <Input
+          label="Email"
+          name="email"
+          type="email"
+          value={form.email}
+          onChange={handleChange}
+          placeholder="tu@email.com"
+          error={emailError}
+        />
+        
         <div>
           <label className="block text-sm font-medium mb-1">Mensaje</label>
           <textarea
@@ -50,7 +87,11 @@ export default function ContactForm() {
             rows={4}
           />
         </div>
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+        >
           Enviar mensaje
         </button>
       </form>
